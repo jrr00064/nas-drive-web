@@ -74,8 +74,8 @@ export const Sidebar = () => {
         className="flex flex-col h-full relative"
         style={{
           width: isCollapsed ? '80px' : '280px',
-          background: 'linear-gradient(180deg, rgba(18, 18, 20, 0.98), rgba(10, 10, 11, 0.98))',
-          borderRight: '1px solid var(--border-default)',
+          background: '#141416',
+          borderRight: '1px solid rgba(255, 255, 255, 0.12)',
           transition: 'width 0.3s cubic-bezier(0.23, 1, 0.32, 1)',
         }}
       >

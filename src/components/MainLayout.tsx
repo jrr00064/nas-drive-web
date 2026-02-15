@@ -113,11 +113,18 @@ export const MainLayout = () => {
   return (
     <div 
       className="flex h-screen overflow-hidden"
-      style={{ background: 'var(--bg-primary)' }}
+      style={{ 
+        background: '#0f0f10',
+      }}
     >
       <Sidebar />
 
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div 
+        className="flex-1 flex flex-col min-w-0 overflow-hidden"
+        style={{ 
+          borderLeft: '1px solid rgba(255, 255, 255, 0.1)',
+        }}
+      >
         <Header />
 
         <div 
@@ -152,9 +159,9 @@ export const MainLayout = () => {
                     transition={{ delay: 0.2 }}
                     className="w-28 h-28 rounded-3xl flex items-center justify-center mb-6"
                     style={{
-                      background: 'linear-gradient(145deg, rgba(26, 26, 29, 0.8), rgba(18, 18, 20, 0.9))',
-                      border: '1px solid var(--border-default)',
-                      boxShadow: 'var(--shadow-lg)',
+                      background: '#1f1f22',
+                      border: '2px solid rgba(255, 255, 255, 0.15)',
+                      boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5)',
                     }}
                   >
                     {searchQuery ? (

@@ -12,7 +12,7 @@ function App() {
       document.documentElement.classList.remove('dark');
     }
     // Ensure body has correct background
-    document.body.style.backgroundColor = '#0a0a0b';
+    document.body.style.backgroundColor = '#0f0f10';
     document.body.style.margin = '0';
     document.body.style.padding = '0';
     document.body.style.minHeight = '100vh';
@@ -21,7 +21,7 @@ function App() {
   return (
     <div style={{ 
       minHeight: '100vh',
-      backgroundColor: '#0a0a0b',
+      backgroundColor: '#0f0f10',
       color: '#fafafa',
     }}>
       <MainLayout />

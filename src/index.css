@@ -5,13 +5,13 @@
 @tailwind utilities;
 
 :root {
-  /* Core Dark Theme - Premium Aesthetic 2026 */
-  --bg-primary: #0a0a0b;
-  --bg-secondary: #121214;
-  --bg-tertiary: #1a1a1d;
-  --bg-elevated: #232326;
-  --bg-hover: #2a2a2e;
-  --bg-active: #323236;
+  /* Core Dark Theme - Better Contrast & Depth */
+  --bg-primary: #0f0f10;
+  --bg-secondary: #18181a;
+  --bg-tertiary: #1f1f22;
+  --bg-elevated: #2a2a2e;
+  --bg-hover: #35353a;
+  --bg-active: #404046;
   
   /* Text Colors */
   --text-primary: #fafafa;
@@ -27,11 +27,11 @@
   --accent-warning: #f59e0b;
   --accent-danger: #ef4444;
   
-  /* Border Colors */
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.1);
-  --border-hover: rgba(255, 255, 255, 0.15);
-  --border-active: rgba(255, 255, 255, 0.2);
+  /* Border Colors - More visible */
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-default: rgba(255, 255, 255, 0.15);
+  --border-hover: rgba(255, 255, 255, 0.25);
+  --border-active: rgba(255, 255, 255, 0.35);
   
   /* Shadows - Soft & Atmospheric */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
