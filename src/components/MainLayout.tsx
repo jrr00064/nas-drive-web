@@ -56,7 +56,6 @@ export const MainLayout = () => {
     if (clickedItem.type === 'folder') {
       navigateToFolder(clickedItem.id);
     } else {
-      // Open file - would typically open a preview or download
       console.log('Opening file:', clickedItem.name);
     }
   };
@@ -94,7 +93,15 @@ export const MainLayout = () => {
     }
   };
 
-  // Context menu is handled by individual file items
+  const handleProperties = () => {
+    if (item) {
+      setModalState((prev) => ({
+        ...prev,
+        properties: { isOpen: true, item },
+      }));
+    }
+  };
+
   useEffect(() => {
     const handleGlobalClick = () => {
       hideMenu();
@@ -104,48 +111,93 @@ export const MainLayout = () => {
   }, [hideMenu]);
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-950">
+    <div 
+      className="flex h-screen overflow-hidden"
+      style={{ background: 'var(--bg-primary)' }}
+    >
       <Sidebar />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Header />
 
-        <div className="flex-1 overflow-auto p-4 sm:p-6">
-          <div className="max-w-7xl mx-auto">
-            <div className="mb-6">
+        <div 
+          className="flex-1 overflow-auto"
+          style={{ background: 'var(--bg-primary)' }}
+        >
+          <div className="max-w-7xl mx-auto p-6">
+            {/* Breadcrumbs */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="mb-6"
+            >
               <Breadcrumbs />
-            </div>
+            </motion.div>
 
+            {/* Content Area */}
             <AnimatePresence mode="wait">
               {filteredItems.length === 0 ? (
                 <motion.div
                   key="empty"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="flex flex-col items-center justify-center py-20"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.3 }}
+                  className="flex flex-col items-center justify-center py-24"
                 >
-                  {searchQuery ? (
-                    <>
-                      <Search className="w-16 h-16 text-gray-300 dark:text-gray-700 mb-4" />
-                      <p className="text-lg text-gray-500 dark:text-gray-400 mb-2">
-                        No results for "{searchQuery}"
-                      </p>
-                      <p className="text-sm text-gray-400 dark:text-gray-500">
-                        Try different keywords or clear your search
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <FolderOpen className="w-16 h-16 text-gray-300 dark:text-gray-700 mb-4" />
-                      <p className="text-lg text-gray-500 dark:text-gray-400 mb-2">
-                        This folder is empty
-                      </p>
-                      <p className="text-sm text-gray-400 dark:text-gray-500">
-                        Add files or folders to get started
-                      </p>
-                    </>
-                  )}
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="w-28 h-28 rounded-3xl flex items-center justify-center mb-6"
+                    style={{
+                      background: 'linear-gradient(145deg, rgba(26, 26, 29, 0.8), rgba(18, 18, 20, 0.9))',
+                      border: '1px solid var(--border-default)',
+                      boxShadow: 'var(--shadow-lg)',
+                    }}
+                  >
+                    {searchQuery ? (
+                      <Search 
+                        className="w-12 h-12" 
+                        style={{ color: 'var(--text-muted)' }}
+                      />
+                    ) : (
+                      <FolderOpen 
+                        className="w-12 h-12" 
+                        style={{ color: 'var(--text-muted)' }}
+                      />
+                    )}
+                  </motion.div>
+                  
+                  <motion.p
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-lg font-medium mb-2"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
+                    {searchQuery ? (
+                      <>
+                        No results for "<span style={{ color: 'var(--accent-primary)' }}>{searchQuery}</span>"
+                      </>
+                    ) : (
+                      'This folder is empty'
+                    )}
+                  </motion.p>
+                  
+                  <motion.p
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="text-sm"
+                    style={{ color: 'var(--text-tertiary)' }}
+                  >
+                    {searchQuery 
+                      ? 'Try different keywords or clear your search'
+                      : 'Add files or folders to get started'
+                    }
+                  </motion.p>
                 </motion.div>
               ) : (
                 <motion.div
@@ -153,6 +205,7 @@ export const MainLayout = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
                 >
                   {viewMode === 'grid' ? (
                     <FileGrid
@@ -171,9 +224,15 @@ export const MainLayout = () => {
               )}
             </AnimatePresence>
 
-            <div className="mt-8">
+            {/* Storage Bar */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="mt-10"
+            >
               <StorageBar />
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
@@ -186,6 +245,7 @@ export const MainLayout = () => {
         onRename={handleRename}
         onMove={handleMove}
         onDelete={handleDelete}
+        onProperties={handleProperties}
       />
 
       <RenameModal

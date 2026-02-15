@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Edit2,
   Move,
@@ -7,6 +7,8 @@ import {
   Copy,
   Download,
   ExternalLink,
+  FolderOpen,
+  File,
 } from 'lucide-react';
 import { useFileStore } from '@store/fileStore';
 import { FileItem } from '@/types/index';
@@ -19,6 +21,7 @@ interface ContextMenuProps {
   onRename: () => void;
   onMove: () => void;
   onDelete: () => void;
+  onProperties: () => void;
 }
 
 export const ContextMenu = ({
@@ -29,6 +32,7 @@ export const ContextMenu = ({
   onRename,
   onMove,
   onDelete,
+  onProperties,
 }: ContextMenuProps) => {
   const { contextMenu } = useFileStore();
 
@@ -37,12 +41,13 @@ export const ContextMenu = ({
   const menuItems = [
     {
       label: 'Open',
-      icon: ExternalLink,
+      icon: item?.type === 'folder' ? FolderOpen : ExternalLink,
       onClick: () => {
         onOpen();
         onClose();
       },
       visible: item?.type === 'folder',
+      accent: true,
     },
     {
       label: 'Rename',
@@ -78,10 +83,12 @@ export const ContextMenu = ({
       },
       visible: item?.type !== 'folder',
     },
+    { separator: true, visible: true },
     {
       label: 'Properties',
       icon: Info,
       onClick: () => {
+        onProperties();
         onClose();
       },
       visible: true,
@@ -101,40 +108,122 @@ export const ContextMenu = ({
   const visibleItems = menuItems.filter((i) => i.visible);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.1 }}
-      data-context-menu
-      style={{
-        left: contextMenu.x,
-        top: contextMenu.y,
-      }}
-      className="fixed z-50 min-w-[180px] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1"
-    >
-      {item && (
-        <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-700 mb-1">
-          <p className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[180px]">
-            {item.name}
-          </p>
-        </div>
-      )}
-
-      {visibleItems.map((menuItem) => (
-        <button
-          key={menuItem.label}
-          onClick={menuItem.onClick}
-          className={`w-full flex items-center gap-3 px-3 py-2 text-sm transition-colors ${
-            menuItem.variant === 'danger'
-              ? 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20'
-              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-          }`}
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 10 }}
+          transition={{ duration: 0.15, ease: [0.23, 1, 0.32, 1] }}
+          data-context-menu
+          style={{
+            left: contextMenu.x,
+            top: contextMenu.y,
+            width: '200px',
+            background: 'linear-gradient(145deg, rgba(35, 35, 38, 0.98), rgba(26, 26, 29, 0.98))',
+            border: '1px solid var(--border-default)',
+            borderRadius: 'var(--radius-lg)',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'blur(12px)',
+          }}
+          className="fixed z-50 py-1.5"
         >
-          <menuItem.icon className="w-4 h-4" />
-          <span>{menuItem.label}</span>
-        </button>
-      ))}
-    </motion.div>
+          {/* Header with item name */}
+          {item && (
+            <div 
+              className="px-3 py-2 mb-1"
+              style={{ 
+                borderBottom: '1px solid var(--border-subtle)',
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-6 h-6 rounded-md flex items-center justify-center"
+                  style={{
+                    background: item.type === 'folder' 
+                      ? 'rgba(139, 92, 246, 0.2)'
+                      : 'rgba(156, 163, 175, 0.2)',
+                  }}
+                >
+                  {item.type === 'folder' ? (
+                    <FolderOpen className="w-3.5 h-3.5" style={{ color: 'var(--accent-primary)' }} />
+                  ) : (
+                    <File className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} />
+                  )}
+                </div>
+                <p 
+                  className="text-xs font-medium truncate flex-1"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
+                  {item.name}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Menu Items */}
+          <div className="px-1">
+            {visibleItems.map((menuItem, index) => (
+              <div key={index}>
+                {'separator' in menuItem ? (
+                  <div
+                    className="my-1.5 mx-1 h-px"
+                    style={{ background: 'var(--border-subtle)' }}
+                  />
+                ) : (
+                  <motion.button
+                    whileHover={{ x: 2 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={menuItem.onClick}
+                    className="w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-sm transition-all duration-150 group"
+                    style={{
+                      color: menuItem.variant === 'danger' 
+                        ? 'var(--accent-danger)'
+                        : menuItem.accent 
+                          ? 'var(--accent-primary)'
+                          : 'var(--text-secondary)',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = menuItem.variant === 'danger'
+                        ? 'rgba(239, 68, 68, 0.1)'
+                        : menuItem.accent
+                          ? 'rgba(139, 92, 246, 0.1)'
+                          : 'var(--bg-elevated)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent';
+                    }}
+                  >
+                    <div
+                      className="w-6 h-6 rounded-md flex items-center justify-center transition-all duration-150"
+                      style={{
+                        background: menuItem.variant === 'danger'
+                          ? 'rgba(239, 68, 68, 0.15)'
+                          : menuItem.accent
+                            ? 'rgba(139, 92, 246, 0.15)'
+                            : 'var(--bg-tertiary)',
+                      }}
+                    >
+                      <menuItem.icon 
+                        className="w-3.5 h-3.5" 
+                        style={{
+                          color: menuItem.variant === 'danger'
+                            ? 'var(--accent-danger)'
+                            : menuItem.accent
+                              ? 'var(--accent-primary)'
+                              : 'var(--text-tertiary)',
+                        }}
+                      />
+                    </div>
+                    
+                    <span className="font-medium">{menuItem.label}</span>
+                  </motion.button>
+                )}
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };

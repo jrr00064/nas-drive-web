@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Folder,
   Image,
@@ -11,6 +11,8 @@ import {
   X,
   Cloud,
   HardDrive,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { useFileStore } from '@store/fileStore';
 import { FileType } from '@/types/index';
@@ -64,112 +66,323 @@ export const Sidebar = () => {
   const fileCount = totalItems - folderCount;
 
   return (
-    <motion.aside
-      initial={{ x: -300 }}
-      animate={{ x: 0 }}
-      className={`bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 ${
-        isCollapsed ? 'w-16' : 'w-64'
-      } transition-all duration-300 flex flex-col h-full`}
-    >
-      <div className="p-4 border-b border-gray-200 dark:border-gray-800">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-            <Cloud className="w-6 h-6 text-white" />
-          </div>
-          {!isCollapsed && (
-            <div>
-              <h1 className="font-bold text-xl text-gray-900 dark:text-white">NAS Drive</h1>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Cloud Storage</p>
-            </div>
-          )}
-        </div>
-
-        {!isCollapsed && (
-          <button
-            onClick={() => setIsCreating(true)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors font-medium"
-          >
-            <Plus className="w-4 h-4" />
-            <span>New Folder</span>
-          </button>
-        )}
-      </div>
-
-      <nav className="flex-1 p-4 space-y-1">
-        {categories.map((category) => {
-          const Icon = categoryIcons[category];
-          const isActive = category === 'home' ? currentFolder === null : false;
-          
-          return (
-            <button
-              key={category}
-              onClick={() => handleCategoryClick(category)}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                isActive
-                  ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-              }`}
-              title={isCollapsed ? categoryLabels[category] : undefined}
-            >
-              <Icon className="w-5 h-5 shrink-0" />
-              {!isCollapsed && <span className="font-medium">{categoryLabels[category]}</span>}
-            </button>
-          );
-        })}
-      </nav>
-
-      {!isCollapsed && (
-        <div className="p-4 border-t border-gray-200 dark:border-gray-800">
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
-            <HardDrive className="w-4 h-4" />
-            <span>{totalItems} items</span>
-          </div>
-          <div className="text-xs text-gray-500 dark:text-gray-500">
-            {folderCount} folders, {fileCount} files
-          </div>
-        </div>
-      )}
-
-      <button
-        onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute bottom-4 right-4 p-2 bg-gray-100 dark:bg-gray-800 rounded-full shadow-md hover:shadow-lg transition-shadow"
+    <>
+      <motion.aside
+        initial={{ x: -280, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+        className="flex flex-col h-full relative"
+        style={{
+          width: isCollapsed ? '80px' : '280px',
+          background: 'linear-gradient(180deg, rgba(18, 18, 20, 0.98), rgba(10, 10, 11, 0.98))',
+          borderRight: '1px solid var(--border-default)',
+          transition: 'width 0.3s cubic-bezier(0.23, 1, 0.32, 1)',
+        }}
       >
-        <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-      </button>
-
-      {isCreating && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-2xl w-80">
-            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">New Folder</h3>
-            <input
-              type="text"
-              value={newFolderName}
-              onChange={(e) => setNewFolderName(e.target.value)}
-              placeholder="Folder name"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              autoFocus
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleCreateFolder();
-                if (e.key === 'Escape') setIsCreating(false);
+        {/* Logo Section */}
+        <div 
+          className="p-5"
+          style={{ borderBottom: '1px solid var(--border-default)' }}
+        >
+          <div className="flex items-center gap-3">
+            <motion.div
+              whileHover={{ scale: 1.05, rotate: 5 }}
+              className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
+              style={{
+                background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
+                boxShadow: '0 8px 24px rgba(139, 92, 246, 0.3)',
               }}
-            />
-            <div className="flex gap-2 justify-end">
-              <button
-                onClick={() => setIsCreating(false)}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleCreateFolder}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-              >
-                Create
-              </button>
-            </div>
+            >
+              <Cloud className="w-6 h-6 text-white" />
+            </motion.div>
+            <AnimatePresence mode="wait">
+              {!isCollapsed && (
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <h1 
+                    className="font-bold text-xl tracking-tight"
+                    style={{ color: 'var(--text-primary)' }}
+                  >
+                    NAS Drive
+                  </h1>
+                  <p 
+                    className="text-xs"
+                    style={{ color: 'var(--text-tertiary)' }}
+                  >
+                    Cloud Storage
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
+
+          {/* New Folder Button */}
+          <AnimatePresence mode="wait">
+            {!isCollapsed && (
+              <motion.button
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                whileHover={{ scale: 1.02, y: -1 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setIsCreating(true)}
+                className="w-full mt-5 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200"
+                style={{
+                  background: 'linear-gradient(135deg, var(--accent-primary), #7c3aed)',
+                  color: 'white',
+                  boxShadow: '0 4px 14px rgba(139, 92, 246, 0.3)',
+                }}
+              >
+                <Plus className="w-4 h-4" />
+                <span>New Folder</span>
+              </motion.button>
+            )}
+          </AnimatePresence>
         </div>
-      )}
-    </motion.aside>
+
+        {/* Navigation */}
+        <nav className="flex-1 p-4 overflow-y-auto">
+          <div className="space-y-1">
+            {categories.map((category, index) => {
+              const Icon = categoryIcons[category];
+              const isActive = category === 'home' ? currentFolder === null : false;
+              
+              return (
+                <motion.button
+                  key={category}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  whileHover={{ scale: 1.02, x: 2 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => handleCategoryClick(category)}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group"
+                  style={{
+                    background: isActive ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(6, 182, 212, 0.1))' : 'transparent',
+                    border: isActive ? '1px solid rgba(139, 92, 246, 0.3)' : '1px solid transparent',
+                  }}
+                  title={isCollapsed ? categoryLabels[category] : undefined}
+                >
+                  <motion.div
+                    whileHover={{ rotate: 5 }}
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center ${isActive ? '' : 'bg-opacity-10'}`}
+                    style={{
+                      background: isActive 
+                        ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.15))'
+                        : 'var(--bg-elevated)',
+                      border: isActive 
+                        ? '1px solid rgba(139, 92, 246, 0.3)'
+                        : '1px solid var(--border-default)',
+                    }}
+                  >
+                    <Icon 
+                      className="w-4 h-4 shrink-0 transition-colors duration-200" 
+                      style={{ color: isActive ? 'var(--accent-primary)' : 'var(--text-tertiary)' }}
+                    />
+                  </motion.div>
+                  <AnimatePresence mode="wait">
+                    {!isCollapsed && (
+                      <motion.span
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        className="font-medium text-sm transition-colors duration-200"
+                        style={{ color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)' }}
+                      >
+                        {categoryLabels[category]}
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </motion.button>
+              );
+            })}
+          </div>
+        </nav>
+
+        {/* Storage Stats */}
+        <AnimatePresence mode="wait">
+          {!isCollapsed && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="p-4 m-4 rounded-2xl"
+              style={{
+                background: 'linear-gradient(145deg, rgba(26, 26, 29, 0.8), rgba(18, 18, 20, 0.9))',
+                border: '1px solid var(--border-default)',
+              }}
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.15))',
+                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                  }}
+                >
+                  <HardDrive 
+                    className="w-5 h-5" 
+                    style={{ color: 'var(--accent-primary)' }}
+                  />
+                </div>
+                <div>
+                  <p className="font-medium text-sm" style={{ color: 'var(--text-primary)' }}>
+                    {totalItems} items
+                  </p>
+                  <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                    {folderCount} folders, {fileCount} files
+                  </p>
+                </div>
+              </div>
+              
+              {/* Mini Storage Bar */}
+              <div className="relative h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--bg-elevated)' }}>
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${(folderCount / (totalItems || 1)) * 100}%` }}
+                  className="absolute h-full rounded-full"
+                  style={{
+                    background: 'linear-gradient(90deg, #8b5cf6, #06b6d4)',
+                  }}
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Collapse Toggle */}
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="absolute -right-3 top-20 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200"
+          style={{
+            background: 'var(--bg-elevated)',
+            border: '1px solid var(--border-default)',
+            color: 'var(--text-tertiary)',
+            boxShadow: 'var(--shadow-md)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = 'var(--border-hover)';
+            e.currentTarget.style.color = 'var(--text-primary)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = 'var(--border-default)';
+            e.currentTarget.style.color = 'var(--text-tertiary)';
+          }}
+        >
+          {isCollapsed ? (
+            <ChevronRight className="w-3 h-3" />
+          ) : (
+            <ChevronLeft className="w-3 h-3" />
+          )}
+        </motion.button>
+      </motion.aside>
+
+      {/* Create Folder Modal */}
+      <AnimatePresence>
+        {isCreating && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            style={{ background: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(4px)' }}
+            onClick={() => setIsCreating(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+              className="w-full max-w-sm p-6 rounded-2xl"
+              style={{
+                background: 'linear-gradient(145deg, rgba(26, 26, 29, 0.95), rgba(18, 18, 20, 0.98))',
+                border: '1px solid var(--border-default)',
+                boxShadow: 'var(--shadow-xl)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-5">
+                <h3 
+                  className="text-lg font-semibold"
+                  style={{ color: 'var(--text-primary)' }}
+                >
+                  New Folder
+                </h3>
+                <motion.button
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setIsCreating(false)}
+                  className="p-1 rounded-full transition-all duration-200"
+                  style={{ color: 'var(--text-tertiary)' }}
+                >
+                  <X className="w-5 h-5" />
+                </motion.button>
+              </div>
+              
+              <input
+                type="text"
+                value={newFolderName}
+                onChange={(e) => setNewFolderName(e.target.value)}
+                placeholder="Folder name"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleCreateFolder();
+                  if (e.key === 'Escape') setIsCreating(false);
+                }}
+                className="w-full px-4 py-3 rounded-xl mb-5 text-sm transition-all duration-200"
+                style={{
+                  background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--border-default)',
+                  color: 'var(--text-primary)',
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border-default)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              />
+              
+              <div className="flex gap-3 justify-end">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setIsCreating(false)}
+                  className="px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-200"
+                  style={{
+                    background: 'var(--bg-elevated)',
+                    border: '1px solid var(--border-default)',
+                    color: 'var(--text-secondary)',
+                  }}
+                >
+                  Cancel
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleCreateFolder}
+                  className="px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-200"
+                  style={{
+                    background: 'linear-gradient(135deg, var(--accent-primary), #7c3aed)',
+                    color: 'white',
+                    boxShadow: '0 4px 14px rgba(139, 92, 246, 0.3)',
+                  }}
+                >
+                  Create
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };

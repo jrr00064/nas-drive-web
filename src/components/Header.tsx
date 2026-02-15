@@ -10,6 +10,7 @@ import {
   Sun,
   FolderPlus,
   Upload,
+  X,
 } from 'lucide-react';
 import { useFileStore } from '@store/fileStore';
 
@@ -39,140 +40,332 @@ export const Header = () => {
   };
 
   return (
-    <motion.header
-      initial={{ y: -60 }}
-      animate={{ y: 0 }}
-      className="h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 flex items-center justify-between gap-4"
-    >
-      <div className="flex items-center gap-2">
-        <button
-          onClick={navigateBack}
-          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-          title="Go back"
-        >
-          <ArrowLeftToLine className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-        </button>
-        <button
-          onClick={navigateUp}
-          disabled={!currentFolder}
-          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-          title="Go up"
-        >
-          <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-        </button>
-      </div>
+    <>
+      <motion.header
+        initial={{ y: -60, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+        className="h-16 px-6 flex items-center justify-between gap-4"
+        style={{
+          background: 'linear-gradient(180deg, rgba(18, 18, 20, 0.95), rgba(18, 18, 20, 0.8))',
+          backdropFilter: 'blur(12px)',
+          borderBottom: '1px solid var(--border-default)',
+        }}
+      >
+        {/* Navigation Buttons */}
+        <div className="flex items-center gap-2">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={navigateBack}
+            className="p-2.5 rounded-xl transition-all duration-200"
+            style={{
+              background: 'var(--bg-elevated)',
+              border: '1px solid var(--border-default)',
+              color: 'var(--text-secondary)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'var(--bg-hover)';
+              e.currentTarget.style.borderColor = 'var(--border-hover)';
+              e.currentTarget.style.color = 'var(--text-primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'var(--bg-elevated)';
+              e.currentTarget.style.borderColor = 'var(--border-default)';
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
+            title="Go back"
+          >
+            <ArrowLeftToLine className="w-4 h-4" />
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={navigateUp}
+            disabled={!currentFolder}
+            className="p-2.5 rounded-xl transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+            style={{
+              background: 'var(--bg-elevated)',
+              border: '1px solid var(--border-default)',
+              color: 'var(--text-secondary)',
+            }}
+            onMouseEnter={(e) => {
+              if (!currentFolder) return;
+              e.currentTarget.style.background = 'var(--bg-hover)';
+              e.currentTarget.style.borderColor = 'var(--border-hover)';
+              e.currentTarget.style.color = 'var(--text-primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'var(--bg-elevated)';
+              e.currentTarget.style.borderColor = 'var(--border-default)';
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
+            title="Go up"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </motion.button>
+        </div>
 
-      <div className="flex-1 max-w-xl">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search files and folders..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-gray-100 dark:bg-gray-800 border border-transparent focus:border-blue-500 focus:bg-white dark:focus:bg-gray-900 rounded-lg text-gray-900 dark:text-white outline-none transition-all"
+        {/* Search Bar */}
+        <div className="flex-1 max-w-xl">
+          <motion.div
+            className="relative group"
+            whileHover={{ scale: 1.01 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Search 
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200" 
+              style={{ color: 'var(--text-tertiary)' }}
+            />
+            <input
+              type="text"
+              placeholder="Search files and folders..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-11 pr-10 py-2.5 rounded-xl text-sm transition-all duration-200"
+              style={{
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--border-default)',
+                color: 'var(--text-primary)',
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-default)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            />
+            {searchQuery && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full transition-all duration-200"
+                style={{
+                  color: 'var(--text-tertiary)',
+                  background: 'var(--bg-elevated)',
+                }}
+                whileHover={{ scale: 1.1, background: 'var(--bg-hover)' }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <X className="w-3 h-3" />
+              </motion.button>
+            )}
+          </motion.div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2">
+          {/* New Folder Button */}
+          <motion.button
+            whileHover={{ scale: 1.02, y: -1 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setIsCreating(true)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200"
+            style={{
+              background: 'var(--bg-elevated)',
+              border: '1px solid var(--border-default)',
+              color: 'var(--text-secondary)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'var(--bg-hover)';
+              e.currentTarget.style.borderColor = 'var(--border-hover)';
+              e.currentTarget.style.color = 'var(--text-primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'var(--bg-elevated)';
+              e.currentTarget.style.borderColor = 'var(--border-default)';
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
+          >
+            <FolderPlus className="w-4 h-4" />
+            <span className="hidden sm:inline">New Folder</span>
+          </motion.button>
+
+          {/* Upload Button */}
+          <motion.button
+            whileHover={{ scale: 1.02, y: -1 }}
+            whileTap={{ scale: 0.98 }}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200"
+            style={{
+              background: 'linear-gradient(135deg, var(--accent-primary), #7c3aed)',
+              color: 'white',
+              boxShadow: '0 4px 14px rgba(139, 92, 246, 0.3)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(139, 92, 246, 0.4)';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = '0 4px 14px rgba(139, 92, 246, 0.3)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            <Upload className="w-4 h-4" />
+            <span className="hidden sm:inline">Upload</span>
+          </motion.button>
+
+          {/* Divider */}
+          <div 
+            className="w-px h-6 mx-1" 
+            style={{ background: 'var(--border-default)' }}
           />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+
+          {/* View Mode Toggle */}
+          <div
+            className="flex items-center rounded-xl p-1"
+            style={{
+              background: 'var(--bg-tertiary)',
+              border: '1px solid var(--border-default)',
+            }}
+          >
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setViewMode('grid')}
+              className="p-2 rounded-lg transition-all duration-200"
+              style={{
+                background: viewMode === 'grid' ? 'var(--bg-elevated)' : 'transparent',
+                color: viewMode === 'grid' ? 'var(--accent-primary)' : 'var(--text-tertiary)',
+                boxShadow: viewMode === 'grid' ? 'var(--shadow-sm)' : 'none',
+              }}
+              title="Grid view"
             >
-              ×
-            </button>
-          )}
-        </div>
-      </div>
+              <Grid3X3 className="w-4 h-4" />
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setViewMode('list')}
+              className="p-2 rounded-lg transition-all duration-200"
+              style={{
+                background: viewMode === 'list' ? 'var(--bg-elevated)' : 'transparent',
+                color: viewMode === 'list' ? 'var(--accent-primary)' : 'var(--text-tertiary)',
+                boxShadow: viewMode === 'list' ? 'var(--shadow-sm)' : 'none',
+              }}
+              title="List view"
+            >
+              <List className="w-4 h-4" />
+            </motion.button>
+          </div>
 
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => setIsCreating(true)}
-          className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-        >
-          <FolderPlus className="w-4 h-4" />
-          <span className="hidden sm:inline">New Folder</span>
-        </button>
-
-        <button
-          className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-        >
-          <Upload className="w-4 h-4" />
-          <span className="hidden sm:inline">Upload</span>
-        </button>
-
-        <div className="w-px h-6 bg-gray-300 dark:bg-gray-700" />
-
-        <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-          <button
-            onClick={() => setViewMode('grid')}
-            className={`p-1.5 rounded-md transition-colors ${
-              viewMode === 'grid'
-                ? 'bg-white dark:bg-gray-700 shadow-sm text-blue-500'
-                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'
-            }`}
-            title="Grid view"
+          {/* Theme Toggle */}
+          <motion.button
+            whileHover={{ scale: 1.05, rotate: isDarkMode ? 180 : 0 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={toggleDarkMode}
+            className="p-2.5 rounded-xl transition-all duration-200"
+            style={{
+              background: 'var(--bg-elevated)',
+              border: '1px solid var(--border-default)',
+              color: isDarkMode ? '#fbbf24' : 'var(--text-secondary)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'var(--bg-hover)';
+              e.currentTarget.style.borderColor = 'var(--border-hover)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'var(--bg-elevated)';
+              e.currentTarget.style.borderColor = 'var(--border-default)';
+            }}
+            title={isDarkMode ? 'Light mode' : 'Dark mode'}
           >
-            <Grid3X3 className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => setViewMode('list')}
-            className={`p-1.5 rounded-md transition-colors ${
-              viewMode === 'list'
-                ? 'bg-white dark:bg-gray-700 shadow-sm text-blue-500'
-                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'
-            }`}
-            title="List view"
-          >
-            <List className="w-4 h-4" />
-          </button>
+            {isDarkMode ? (
+              <Sun className="w-4 h-4" />
+            ) : (
+              <Moon className="w-4 h-4" />
+            )}
+          </motion.button>
         </div>
+      </motion.header>
 
-        <button
-          onClick={toggleDarkMode}
-          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-          title={isDarkMode ? 'Light mode' : 'Dark mode'}
-        >
-          {isDarkMode ? (
-            <Sun className="w-5 h-5 text-yellow-500" />
-          ) : (
-            <Moon className="w-5 h-5 text-gray-600" />
-          )}
-        </button>
-      </div>
-
+      {/* Create Folder Modal */}
       {isCreating && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center"
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ background: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(4px)' }}
+          onClick={() => setIsCreating(false)}
         >
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-2xl w-80">
-            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">New Folder</h3>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+            className="w-full max-w-sm p-6 rounded-2xl"
+            style={{
+              background: 'linear-gradient(145deg, rgba(26, 26, 29, 0.95), rgba(18, 18, 20, 0.98))',
+              border: '1px solid var(--border-default)',
+              boxShadow: 'var(--shadow-xl)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 
+              className="text-lg font-semibold mb-4"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              New Folder
+            </h3>
             <input
               type="text"
               value={newFolderName}
               onChange={(e) => setNewFolderName(e.target.value)}
               placeholder="Folder name"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               autoFocus
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleCreateFolder();
                 if (e.key === 'Escape') setIsCreating(false);
               }}
+              className="w-full px-4 py-3 rounded-xl mb-5 text-sm transition-all duration-200"
+              style={{
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--border-default)',
+                color: 'var(--text-primary)',
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-default)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
             />
-            <div className="flex gap-2 justify-end">
-              <button
+            <div className="flex gap-3 justify-end">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => setIsCreating(false)}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                className="px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200"
+                style={{
+                  background: 'var(--bg-elevated)',
+                  border: '1px solid var(--border-default)',
+                  color: 'var(--text-secondary)',
+                }}
               >
                 Cancel
-              </button>
-              <button
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={handleCreateFolder}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                className="px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200"
+                style={{
+                  background: 'linear-gradient(135deg, var(--accent-primary), #7c3aed)',
+                  color: 'white',
+                  boxShadow: '0 4px 14px rgba(139, 92, 246, 0.3)',
+                }}
               >
                 Create
-              </button>
+              </motion.button>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
-    </motion.header>
+    </>
   );
 };
