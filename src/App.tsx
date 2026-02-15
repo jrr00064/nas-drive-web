@@ -11,10 +11,19 @@ function App() {
     } else {
       document.documentElement.classList.remove('dark');
     }
+    // Ensure body has correct background
+    document.body.style.backgroundColor = '#0a0a0b';
+    document.body.style.margin = '0';
+    document.body.style.padding = '0';
+    document.body.style.minHeight = '100vh';
   }, [isDarkMode]);
 
   return (
-    <div className="html.dark:bg-gray-950 transition-colors">
+    <div style={{ 
+      minHeight: '100vh',
+      backgroundColor: '#0a0a0b',
+      color: '#fafafa',
+    }}>
       <MainLayout />
     </div>
   );
